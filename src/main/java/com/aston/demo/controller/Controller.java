@@ -2,18 +2,20 @@ package com.aston.demo.controller;
 
 
 import com.aston.demo.exception.BusinessException;
-import com.aston.demo.model.Request.Request;
-import com.aston.demo.model.Request.Transaction;
-import com.aston.demo.model.Response.ResponseCreate;
-import com.aston.demo.model.Response.Info;
+import com.aston.demo.model.Request.AccountData;
+import com.aston.demo.model.Request.CustomerData;
+import com.aston.demo.model.Deposit;
+import com.aston.demo.model.Response.BankingHistory;
+import com.aston.demo.model.Transfer;
+import com.aston.demo.model.Withdraw;
+import com.aston.demo.model.Response.BankAccountInfo;
+import com.aston.demo.model.Response.StatementBalance;
 import com.aston.demo.model.Response.ResponseTransaction;
 import com.aston.demo.service.ServiceImpl;
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 public class Controller {
@@ -24,53 +26,55 @@ public class Controller {
         this.clientService = clientService;
     }
 
-//    @ExceptionHandler(BusinessException.class)
-//    public Response handleException(BusinessException e) {
-//        return new Response(e.getMessage());
-//    }
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity handleException(BusinessException e) {
+        Exception exception = new Exception(e.getMessage());
+        return new ResponseEntity<>(exception, HttpStatus.BAD_REQUEST);
+    }
 
     @PostMapping(value = "/create")
-    public ResponseEntity<ResponseCreate> create(@RequestBody Request request) throws Exception {
-        ResponseCreate responseCreate = clientService.create(request.getFirstName(), request.getLastName(),
-                request.getFatherName(), request.getPin());
-        return ResponseEntity.ok(responseCreate);
+    public ResponseEntity<BankAccountInfo> create(@RequestBody CustomerData customerData) throws Exception {
+        BankAccountInfo bankAccountInfo = clientService.create(customerData.getFirstName(), customerData.getLastName(),
+                customerData.getFatherName(), customerData.getPin());
+        return ResponseEntity.ok(bankAccountInfo);
     }
 
 
-    @RequestMapping("/info")
-    public ResponseEntity<Info> balance(@RequestBody Request request) throws BusinessException {
-        Info responseInfo = clientService.info(request.getFirstName(), request.getLastName(),
-                request.getFatherName(), request.getPin());
-        return ResponseEntity.ok(responseInfo);
+    @PostMapping("/balance")
+    public ResponseEntity<StatementBalance> statementBalance(@RequestBody CustomerData customerData) throws BusinessException {
+        StatementBalance statementBalance = clientService.info(customerData.getFirstName(), customerData.getLastName(),
+                customerData.getFatherName(), customerData.getPin());
+        return ResponseEntity.ok(statementBalance);
     }
 
     @RequestMapping("/history")
-    public String history(@RequestBody Request request) {
-        return "history";
+    public ResponseEntity<BankingHistory>  history(@RequestBody AccountData accountData) throws BusinessException {
+        BankingHistory bankingHistory = clientService.history(accountData.getFirstName(), accountData.getLastName(),
+                accountData.getFatherName(), accountData.getPin(), accountData.getAccountNumber());
+        return ResponseEntity.ok(bankingHistory);
     }
 
-    @RequestMapping("/deposit")
-    public ResponseEntity<ResponseTransaction> deposit(@RequestBody Transaction transaction) throws BusinessException {
-        ResponseTransaction responseTransaction = clientService.deposit(transaction.getFirstName(), transaction.getLastName(),
-                transaction.getFatherName(), transaction.getPin(), transaction.getAccountNumberFrom(), transaction.getAccountNumberTo(),
-                transaction.getCount());
+    @PostMapping("/deposit")
+    public ResponseEntity<ResponseTransaction> deposit(@RequestBody Deposit deposit) throws BusinessException {
+        ResponseTransaction responseTransaction = clientService.deposit(deposit.getFirstName(), deposit.getLastName(),
+                deposit.getFatherName(), deposit.getPin(), deposit.getAccountNumberTo(),
+                deposit.getCount());
         return ResponseEntity.ok(responseTransaction);
     }
 
-    @RequestMapping("/withdraw")
-    public ResponseEntity<ResponseTransaction> withdraw(@RequestBody Transaction transaction) throws BusinessException {
-        ResponseTransaction responseTransaction = clientService.withdraw(transaction.getFirstName(), transaction.getLastName(),
-                transaction.getFatherName(), transaction.getPin(), transaction.getAccountNumberFrom(), transaction.getAccountNumberTo(),
-                transaction.getCount());
+    @PostMapping("/withdraw")
+    public ResponseEntity<ResponseTransaction> withdraw(@RequestBody Withdraw withdraw) throws BusinessException {
+        ResponseTransaction responseTransaction = clientService.withdraw(withdraw.getFirstName(), withdraw.getLastName(),
+                withdraw.getFatherName(), withdraw.getPin(), withdraw.getAccountNumberFrom(), withdraw.getCount());
         return ResponseEntity.ok(responseTransaction);
     }
 
 
-    @RequestMapping("/transfer")
-    public ResponseEntity<ResponseTransaction> transfer(@RequestBody Transaction transaction) throws BusinessException {
-        ResponseTransaction responseTransaction = clientService.transfer(transaction.getFirstName(), transaction.getLastName(),
-                transaction.getFatherName(), transaction.getPin(), transaction.getAccountNumberFrom(), transaction.getAccountNumberTo(),
-                transaction.getCount());
+    @PostMapping("/transfer")
+    public ResponseEntity<ResponseTransaction> transfer(@RequestBody Transfer transfer) throws BusinessException {
+        ResponseTransaction responseTransaction = clientService.transfer(transfer.getFirstName(), transfer.getLastName(),
+                transfer.getFatherName(), transfer.getPin(), transfer.getAccountNumberFrom(), transfer.getAccountNumberTo(),
+                transfer.getCount());
         return ResponseEntity.ok(responseTransaction);
     }
 

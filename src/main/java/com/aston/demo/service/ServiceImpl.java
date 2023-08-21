@@ -3,9 +3,11 @@ package com.aston.demo.service;
 
 import com.aston.demo.entity.BankAccount;
 import com.aston.demo.entity.Client;
+import com.aston.demo.entity.Transaction;
 import com.aston.demo.exception.BusinessException;
-import com.aston.demo.model.Response.Info;
-import com.aston.demo.model.Response.ResponseCreate;
+import com.aston.demo.model.Response.BankingHistory;
+import com.aston.demo.model.Response.StatementBalance;
+import com.aston.demo.model.Response.BankAccountInfo;
 import com.aston.demo.model.Response.ResponseTransaction;
 import com.aston.demo.repository.BankAccountRepository;
 import com.aston.demo.repository.ClientRepository;
@@ -23,6 +25,8 @@ import java.util.UUID;
 @Service
 public class ServiceImpl {
 
+    private static UUID ATM_NUMBER = new UUID(0, 0);
+
     @Autowired
     private ClientRepository clientRepository;
 
@@ -33,7 +37,7 @@ public class ServiceImpl {
     private TransactionRepository transactionRepository;
 
     @Transactional
-    public ResponseCreate create(String firstName, String lastName, String fatherName, String pin) throws BusinessException {
+    public BankAccountInfo create(String firstName, String lastName, String fatherName, String pin) throws BusinessException {
         Client client = clientRepository.findByFirstNameAndLastName(firstName, lastName);
 
         if (client == null) {
@@ -45,26 +49,37 @@ public class ServiceImpl {
         }
         BankAccount bankAccount = new BankAccount(client.getId(), 0);
         bankAccountRepository.save(bankAccount);
-        return new ResponseCreate(client.getFirstName(), client.getLastName(), client.getFatherName(),
+        return new BankAccountInfo(client.getFirstName(), client.getLastName(), client.getFatherName(),
                 bankAccount.getId(), bankAccount.getBalance());
     }
 
     @Transactional
-    public Info info(String firstName, String lastName, String fatherName, String pin) throws BusinessException {
+    public StatementBalance info(String firstName, String lastName, String fatherName, String pin) throws BusinessException {
         Client client = clientRepository.findByFirstNameAndLastName(firstName, lastName);
-        System.out.println(client.getId());
-        BankAccount[] bankAccounts = bankAccountRepository.findIdAndBalanceByClientId(client.getId());
-        System.out.println(bankAccounts.length);
+        BankAccount[] bankAccounts = bankAccountRepository.findByClientId(client.getId());
         if (!md5sum(pin).equals(client.getPinHash())) {
             throw new BusinessException("PIN не подходит");
         }
-        Info responseInfo = new Info(client.getFirstName(), client.getLastName(), client.getFatherName(), bankAccounts);
-        return responseInfo;
+        StatementBalance responseStatementBalance = new StatementBalance(client.getFirstName(), client.getLastName(), client.getFatherName(), bankAccounts);
+        return responseStatementBalance;
     }
 
     @Transactional
+    public BankingHistory history(String firstName, String lastName, String fatherName, String pin, UUID accountNumber) throws BusinessException {
+        Client client = clientRepository.findByFirstNameAndLastName(firstName, lastName);
+        System.out.println(ATM_NUMBER);
+        if (!md5sum(pin).equals(client.getPinHash())) {
+            throw new BusinessException("PIN не подходит");
+        }
+
+        Transaction[] transactions = transactionRepository.findByAccountNumberFromOrAccountNumberTo(accountNumber, accountNumber);
+        return new BankingHistory(firstName, lastName, fatherName, accountNumber, transactions);
+    }
+
+
+    @Transactional
     public ResponseTransaction deposit(String firstName, String lastName, String fatherName, String pin,
-                                       UUID accountNumberFrom, UUID accountNumberTo, Integer count) throws BusinessException {
+                                       UUID accountNumberTo, Integer count) throws BusinessException {
         Client client = clientRepository.findByFirstNameAndLastName(firstName, lastName);
         if (!md5sum(pin).equals(client.getPinHash())) {
             throw new BusinessException("PIN не подходит");
@@ -74,7 +89,7 @@ public class ServiceImpl {
         synchronized (bankAccount.getId().toString().intern()) {
             bankAccount.setBalance(bankAccount.getBalance() + count);
             bankAccountRepository.save(bankAccount);
-            transactionRepository.save(new com.aston.demo.entity.Transaction(null, accountNumberTo,
+            transactionRepository.save(new Transaction(ATM_NUMBER, accountNumberTo,
                     count, LocalDateTime.now()));
             return new ResponseTransaction(firstName, lastName, fatherName,
                     null, accountNumberTo, count);
@@ -84,7 +99,7 @@ public class ServiceImpl {
 
     @Transactional
     public ResponseTransaction withdraw(String firstName, String lastName, String fatherName, String pin,
-                                        UUID accountNumberFrom, UUID accountNumberTo, Integer count) throws BusinessException {
+                                        UUID accountNumberFrom, Integer count) throws BusinessException {
         Client client = clientRepository.findByFirstNameAndLastName(firstName, lastName);
         if (!md5sum(pin).equals(client.getPinHash())) {
             throw new BusinessException("PIN не подходит.");
@@ -96,7 +111,7 @@ public class ServiceImpl {
             }
             bankAccount.setBalance(bankAccount.getBalance() - count);
             bankAccountRepository.save(bankAccount);
-            transactionRepository.save(new com.aston.demo.entity.Transaction(accountNumberFrom, null,
+            transactionRepository.save(new Transaction(accountNumberFrom, ATM_NUMBER,
                     count, LocalDateTime.now()));
             return new ResponseTransaction(firstName, lastName, fatherName,
                     accountNumberFrom, null, count);
@@ -126,7 +141,7 @@ public class ServiceImpl {
                 bankAccountTo.setBalance(bankAccountTo.getBalance() + count);
                 bankAccountRepository.save(bankAccountFrom);
                 bankAccountRepository.save(bankAccountTo);
-                transactionRepository.save(new com.aston.demo.entity.Transaction(accountNumberFrom, accountNumberTo,
+                transactionRepository.save(new Transaction(accountNumberFrom, accountNumberTo,
                         count, LocalDateTime.now()));
                 return new ResponseTransaction(firstName, lastName, fatherName,
                         accountNumberFrom, accountNumberTo, count);

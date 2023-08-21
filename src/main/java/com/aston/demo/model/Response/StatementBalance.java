@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class Info {
+public class StatementBalance {
 
     private String firstName;
     private String lastName;

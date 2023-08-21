@@ -10,6 +10,6 @@ import java.util.UUID;
 
 public interface BankAccountRepository extends JpaRepository<BankAccount, UUID> {
 
-    BankAccount[] findIdAndBalanceByClientId(Long ClientId);
+    BankAccount[] findByClientId(Long ClientId);
 
 }
