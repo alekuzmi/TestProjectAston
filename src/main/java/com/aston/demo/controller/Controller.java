@@ -5,12 +5,9 @@ import com.aston.demo.exception.BusinessException;
 import com.aston.demo.model.Request.AccountData;
 import com.aston.demo.model.Request.CustomerData;
 import com.aston.demo.model.Deposit;
-import com.aston.demo.model.Response.BankingHistory;
+import com.aston.demo.model.Response.*;
 import com.aston.demo.model.Transfer;
 import com.aston.demo.model.Withdraw;
-import com.aston.demo.model.Response.BankAccountInfo;
-import com.aston.demo.model.Response.StatementBalance;
-import com.aston.demo.model.Response.ResponseTransaction;
 import com.aston.demo.service.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,9 +24,10 @@ public class Controller {
     }
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity handleException(BusinessException e) {
-        Exception exception = new Exception(e.getMessage());
-        return new ResponseEntity<>(exception, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorMessage> handleException(BusinessException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorMessage(exception.getMessage()));
     }
 
     @PostMapping(value = "/create")
