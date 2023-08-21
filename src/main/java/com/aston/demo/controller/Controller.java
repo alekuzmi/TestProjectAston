@@ -9,6 +9,7 @@ import com.aston.demo.model.Response.*;
 import com.aston.demo.model.Transfer;
 import com.aston.demo.model.Withdraw;
 import com.aston.demo.service.ServiceImpl;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class Controller {
     }
 
     @PostMapping(value = "/create")
-    public ResponseEntity<BankAccountInfo> create(@RequestBody CustomerData customerData) throws Exception {
+    public ResponseEntity<BankAccountInfo> create(@Valid @RequestBody CustomerData customerData) throws Exception {
         BankAccountInfo bankAccountInfo = clientService.create(customerData.getFirstName(), customerData.getLastName(),
                 customerData.getFatherName(), customerData.getPin());
         return ResponseEntity.ok(bankAccountInfo);
@@ -39,21 +40,21 @@ public class Controller {
 
 
     @PostMapping("/balance")
-    public ResponseEntity<StatementBalance> statementBalance(@RequestBody CustomerData customerData) throws BusinessException {
+    public ResponseEntity<StatementBalance> statementBalance(@Valid @RequestBody CustomerData customerData) throws BusinessException {
         StatementBalance statementBalance = clientService.info(customerData.getFirstName(), customerData.getLastName(),
                 customerData.getFatherName(), customerData.getPin());
         return ResponseEntity.ok(statementBalance);
     }
 
     @RequestMapping("/history")
-    public ResponseEntity<BankingHistory>  history(@RequestBody AccountData accountData) throws BusinessException {
+    public ResponseEntity<BankingHistory>  history(@Valid @RequestBody AccountData accountData) throws BusinessException {
         BankingHistory bankingHistory = clientService.history(accountData.getFirstName(), accountData.getLastName(),
                 accountData.getFatherName(), accountData.getPin(), accountData.getAccountNumber());
         return ResponseEntity.ok(bankingHistory);
     }
 
     @PostMapping("/deposit")
-    public ResponseEntity<ResponseTransaction> deposit(@RequestBody Deposit deposit) throws BusinessException {
+    public ResponseEntity<ResponseTransaction> deposit(@Valid @RequestBody Deposit deposit) throws BusinessException {
         ResponseTransaction responseTransaction = clientService.deposit(deposit.getFirstName(), deposit.getLastName(),
                 deposit.getFatherName(), deposit.getPin(), deposit.getAccountNumberTo(),
                 deposit.getCount());
@@ -61,7 +62,7 @@ public class Controller {
     }
 
     @PostMapping("/withdraw")
-    public ResponseEntity<ResponseTransaction> withdraw(@RequestBody Withdraw withdraw) throws BusinessException {
+    public ResponseEntity<ResponseTransaction> withdraw(@Valid @RequestBody Withdraw withdraw) throws BusinessException {
         ResponseTransaction responseTransaction = clientService.withdraw(withdraw.getFirstName(), withdraw.getLastName(),
                 withdraw.getFatherName(), withdraw.getPin(), withdraw.getAccountNumberFrom(), withdraw.getCount());
         return ResponseEntity.ok(responseTransaction);
@@ -69,7 +70,7 @@ public class Controller {
 
 
     @PostMapping("/transfer")
-    public ResponseEntity<ResponseTransaction> transfer(@RequestBody Transfer transfer) throws BusinessException {
+    public ResponseEntity<ResponseTransaction> transfer(@Valid @RequestBody Transfer transfer) throws BusinessException {
         ResponseTransaction responseTransaction = clientService.transfer(transfer.getFirstName(), transfer.getLastName(),
                 transfer.getFatherName(), transfer.getPin(), transfer.getAccountNumberFrom(), transfer.getAccountNumberTo(),
                 transfer.getCount());

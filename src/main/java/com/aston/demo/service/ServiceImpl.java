@@ -56,6 +56,9 @@ public class ServiceImpl {
     @Transactional
     public StatementBalance info(String firstName, String lastName, String fatherName, String pin) throws BusinessException {
         Client client = clientRepository.findByFirstNameAndLastName(firstName, lastName);
+        if (client == null) {
+            throw new BusinessException("Нет такого клиента.");
+        }
         BankAccount[] bankAccounts = bankAccountRepository.findByClientId(client.getId());
         if (!md5sum(pin).equals(client.getPinHash())) {
             throw new BusinessException("PIN не подходит");
@@ -67,7 +70,9 @@ public class ServiceImpl {
     @Transactional
     public BankingHistory history(String firstName, String lastName, String fatherName, String pin, UUID accountNumber) throws BusinessException {
         Client client = clientRepository.findByFirstNameAndLastName(firstName, lastName);
-        System.out.println(ATM_NUMBER);
+        if (client == null) {
+            throw new BusinessException("Нет такого клиента.");
+        }
         if (!md5sum(pin).equals(client.getPinHash())) {
             throw new BusinessException("PIN не подходит");
         }
@@ -81,6 +86,9 @@ public class ServiceImpl {
     public ResponseTransaction deposit(String firstName, String lastName, String fatherName, String pin,
                                        UUID accountNumberTo, Integer count) throws BusinessException {
         Client client = clientRepository.findByFirstNameAndLastName(firstName, lastName);
+        if (client == null) {
+            throw new BusinessException("Нет такого клиента.");
+        }
         if (!md5sum(pin).equals(client.getPinHash())) {
             throw new BusinessException("PIN не подходит");
         }
@@ -101,6 +109,9 @@ public class ServiceImpl {
     public ResponseTransaction withdraw(String firstName, String lastName, String fatherName, String pin,
                                         UUID accountNumberFrom, Integer count) throws BusinessException {
         Client client = clientRepository.findByFirstNameAndLastName(firstName, lastName);
+        if (client == null) {
+            throw new BusinessException("Нет такого клиента.");
+        }
         if (!md5sum(pin).equals(client.getPinHash())) {
             throw new BusinessException("PIN не подходит.");
         }
@@ -122,6 +133,9 @@ public class ServiceImpl {
     public ResponseTransaction transfer(String firstName, String lastName, String fatherName, String pin,
                                         UUID accountNumberFrom, UUID accountNumberTo, Integer count) throws BusinessException {
         Client client = clientRepository.findByFirstNameAndLastName(firstName, lastName);
+        if (client == null) {
+            throw new BusinessException("Нет такого клиента.");
+        }
         if (!md5sum(pin).equals(client.getPinHash())) {
             throw new BusinessException("PIN не подходит");
         }
