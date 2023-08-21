@@ -3,10 +3,9 @@ package com.aston.demo.service;
 
 import com.aston.demo.entity.BankAccount;
 import com.aston.demo.entity.Client;
-import com.aston.demo.model.Request.Request;
-import com.aston.demo.model.Request.Transaction;
-import com.aston.demo.model.Response.ResponseCreate;
+import com.aston.demo.exception.BusinessException;
 import com.aston.demo.model.Response.Info;
+import com.aston.demo.model.Response.ResponseCreate;
 import com.aston.demo.model.Response.ResponseTransaction;
 import com.aston.demo.repository.BankAccountRepository;
 import com.aston.demo.repository.ClientRepository;
@@ -19,6 +18,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class ServiceImpl {
@@ -33,88 +33,91 @@ public class ServiceImpl {
     private TransactionRepository transactionRepository;
 
     @Transactional
-    public ResponseCreate create(Request request) {
-        Client client = clientRepository.findByFirstNameAndLastName(request.getFirstName(), request.getLastName());
+    public ResponseCreate create(String firstName, String lastName, String fatherName, String pin) throws BusinessException {
+        Client client = clientRepository.findByFirstNameAndLastName(firstName, lastName);
 
         if (client == null) {
-            client = new Client(md5sum(request.getPin()),
-                    request.getFirstName(), request.getLastName(), request.getFatherName());
+            client = new Client(md5sum(pin), firstName, lastName, fatherName);
             clientRepository.save(client);
         }
-        if (!md5sum(request.getPin()).equals(client.getPinHash())) {
-            return null;
+        if (!md5sum(pin).equals(client.getPinHash())) {
+            throw new BusinessException("PIN не подходит");
         }
-        BankAccount bankAccount = new BankAccount(client.getId(),  0);
+        BankAccount bankAccount = new BankAccount(client.getId(), 0);
         bankAccountRepository.save(bankAccount);
-        return new ResponseCreate(client.getFirstName(), client.getLastName(), client.getFatherName(), bankAccount.getId(), bankAccount.getBalance());
+        return new ResponseCreate(client.getFirstName(), client.getLastName(), client.getFatherName(),
+                bankAccount.getId(), bankAccount.getBalance());
     }
 
     @Transactional
-    public Info info(Request request) {
-        Client client = clientRepository.findByFirstNameAndLastName(request.getFirstName(), request.getLastName());
+    public Info info(String firstName, String lastName, String fatherName, String pin) throws BusinessException {
+        Client client = clientRepository.findByFirstNameAndLastName(firstName,lastName);
         System.out.println(client.getId());
         BankAccount[] bankAccounts = bankAccountRepository.findIdAndBalanceByClientId(client.getId());
         System.out.println(bankAccounts.length);
-        if (!md5sum(request.getPin()).equals(client.getPinHash())) {
-
+        if (!md5sum(pin).equals(client.getPinHash())) {
+            throw new BusinessException("PIN не подходит");
         }
         Info responseInfo = new Info(client.getFirstName(), client.getLastName(), client.getFatherName(), bankAccounts);
         return responseInfo;
     }
 
     @Transactional
-    public ResponseTransaction deposit(Transaction transaction) {
-        Client client = clientRepository.findByFirstNameAndLastName(transaction.getFirstName(), transaction.getLastName());
-        if (!md5sum(transaction.getPin()).equals(client.getPinHash())) {
-
+    public ResponseTransaction deposit(String firstName, String lastName, String fatherName, String pin,
+                                       UUID accountNumberFrom, UUID accountNumberTo, Integer count) throws BusinessException {
+        Client client = clientRepository.findByFirstNameAndLastName(firstName, lastName);
+        if (!md5sum(pin).equals(client.getPinHash())) {
+            throw new BusinessException("PIN не подходит");
         }
-        BankAccount bankAccount = bankAccountRepository.findById(transaction.getAccountNumberTo()).get();
-        bankAccount.setBalance(bankAccount.getBalance() + transaction.getCount());
+        BankAccount bankAccount = bankAccountRepository.findById(accountNumberTo).get();
+        bankAccount.setBalance(bankAccount.getBalance() + count);
         bankAccountRepository.save(bankAccount);
-        transactionRepository.save(new com.aston.demo.entity.Transaction(null, transaction.getAccountNumberTo(),
-                transaction.getCount(),  LocalDateTime.now()));
-        return new ResponseTransaction(transaction.getFirstName(), transaction.getLastName(), transaction.getFatherName(),
-                null, transaction.getAccountNumberTo(), transaction.getCount());
+        transactionRepository.save(new com.aston.demo.entity.Transaction(null, accountNumberTo,
+                count, LocalDateTime.now()));
+        return new ResponseTransaction(firstName, lastName, fatherName,
+                null, accountNumberTo, count);
     }
 
 
     @Transactional
-    public ResponseTransaction withdraw(Transaction transaction) {
-        Client client = clientRepository.findByFirstNameAndLastName(transaction.getFirstName(), transaction.getLastName());
-        if (!md5sum(transaction.getPin()).equals(client.getPinHash())) {
-
+    public ResponseTransaction withdraw(String firstName, String lastName, String fatherName, String pin,
+                                        UUID accountNumberFrom, UUID accountNumberTo, Integer count) throws BusinessException {
+        Client client = clientRepository.findByFirstNameAndLastName(firstName, lastName);
+        if (!md5sum(pin).equals(client.getPinHash())) {
+            throw new BusinessException("PIN не подходит.");
         }
-        BankAccount bankAccount = bankAccountRepository.findById(transaction.getAccountNumberFrom()).get();
-        if (transaction.getCount() > bankAccount.getBalance()){
-            return null;
+        BankAccount bankAccount = bankAccountRepository.findById(accountNumberFrom).get();
+        if (count > bankAccount.getBalance()) {
+            throw new BusinessException("Недостаточно средств.");
         }
-        bankAccount.setBalance(bankAccount.getBalance() - transaction.getCount());
+        bankAccount.setBalance(bankAccount.getBalance() - count);
         bankAccountRepository.save(bankAccount);
-        transactionRepository.save(new com.aston.demo.entity.Transaction(transaction.getAccountNumberFrom(), null,
-                transaction.getCount(),  LocalDateTime.now()));
-        return new ResponseTransaction(transaction.getFirstName(), transaction.getLastName(), transaction.getFatherName(),
-                transaction.getAccountNumberFrom(), null, transaction.getCount());
+        transactionRepository.save(new com.aston.demo.entity.Transaction(accountNumberFrom, null,
+               count, LocalDateTime.now()));
+        return new ResponseTransaction(firstName, lastName, fatherName,
+                accountNumberFrom, null, count);
     }
 
     @Transactional
-    public ResponseTransaction transfer(Transaction transaction) {
-        Client client = clientRepository.findByFirstNameAndLastName(transaction.getFirstName(), transaction.getLastName());
-        if (!md5sum(transaction.getPin()).equals(client.getPinHash())) {
-
+    public ResponseTransaction transfer(String firstName, String lastName, String fatherName, String pin,
+                                        UUID accountNumberFrom, UUID accountNumberTo, Integer count) throws BusinessException {
+        Client client = clientRepository.findByFirstNameAndLastName(firstName, lastName);
+        if (!md5sum(pin).equals(client.getPinHash())) {
+            throw new BusinessException("PIN не подходит");
         }
-        BankAccount bankAccountFrom = bankAccountRepository.findById(transaction.getAccountNumberFrom()).get();
-        BankAccount bankAccountTo = bankAccountRepository.findById(transaction.getAccountNumberTo()).get();
-        if (transaction.getCount() > bankAccountFrom.getBalance()){
-            return null;
+        BankAccount bankAccountFrom = bankAccountRepository.findById(accountNumberFrom).get();
+        BankAccount bankAccountTo = bankAccountRepository.findById(accountNumberTo).get();
+        if (count > bankAccountFrom.getBalance()) {
+            throw new BusinessException("Недостаточно средств.");
         }
-        bankAccountFrom.setBalance(bankAccountFrom.getBalance() - transaction.getCount());
-        bankAccountTo.setBalance(bankAccountTo.getBalance() + transaction.getCount());
+        bankAccountFrom.setBalance(bankAccountFrom.getBalance() - count);
+        bankAccountTo.setBalance(bankAccountTo.getBalance() + count);
         bankAccountRepository.save(bankAccountFrom);
         bankAccountRepository.save(bankAccountTo);
-        transactionRepository.save(new com.aston.demo.entity.Transaction(transaction.getAccountNumberFrom(), transaction.getAccountNumberTo(),
-                transaction.getCount(),  LocalDateTime.now()));
-        return new ResponseTransaction(transaction.getFirstName(), transaction.getLastName(), transaction.getFatherName(),
-                transaction.getAccountNumberFrom(), transaction.getAccountNumberTo(), transaction.getCount());
+        transactionRepository.save(new com.aston.demo.entity.Transaction(accountNumberFrom, accountNumberTo,
+                count, LocalDateTime.now()));
+        return new ResponseTransaction(firstName, lastName, fatherName,
+                accountNumberFrom, accountNumberTo, count);
     }
 
     public static String md5sum(String input) {
