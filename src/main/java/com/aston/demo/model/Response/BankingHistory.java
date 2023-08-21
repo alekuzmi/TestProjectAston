@@ -1,6 +1,5 @@
 package com.aston.demo.model.Response;
 
-import com.aston.demo.entity.BankAccount;
 import com.aston.demo.entity.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
