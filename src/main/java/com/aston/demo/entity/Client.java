@@ -2,7 +2,12 @@ package com.aston.demo.entity;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "clients")
 public class Client {
@@ -31,46 +36,6 @@ public class Client {
         this.pinHash = pinHash;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.fatherName = fatherName;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getPinHash() {
-        return pinHash;
-    }
-
-    public void setPinHash(String pinHash) {
-        this.pinHash = pinHash;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getFatherName() {
-        return fatherName;
-    }
-
-    public void setFatherName(String fatherName) {
         this.fatherName = fatherName;
     }
 }

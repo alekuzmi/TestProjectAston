@@ -1,9 +1,14 @@
 package com.aston.demo.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "bank_accounts")
 public class BankAccount {
@@ -24,30 +29,6 @@ public class BankAccount {
 
     public BankAccount(Long clientId, Integer balance) {
         this.clientId = clientId;
-        this.balance = balance;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public Long getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(Long clientId) {
-        this.clientId = clientId;
-    }
-
-    public Integer getBalance() {
-        return balance;
-    }
-
-    public void setBalance(Integer balance) {
         this.balance = balance;
     }
 }

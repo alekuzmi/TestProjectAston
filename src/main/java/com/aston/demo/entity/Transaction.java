@@ -1,10 +1,15 @@
 package com.aston.demo.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "transactions")
 public class Transaction {
@@ -29,50 +34,10 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction(UUID accountNumberFrom, UUID accountNumberTo, Integer count, LocalDateTime time) {
+    public Transaction(UUID accountNumberFrom, UUID accountNumberTo, Integer amount, LocalDateTime time) {
         this.accountNumberFrom = accountNumberFrom;
         this.accountNumberTo = accountNumberTo;
-        this.amount = count;
-        this.time = time;
-    }
-
-    public UUID getAccountNumberFrom() {
-        return accountNumberFrom;
-    }
-
-    public void setAccountNumberFrom(UUID accountNumberFrom) {
-        this.accountNumberFrom = accountNumberFrom;
-    }
-
-    public UUID getAccountNumberTo() {
-        return accountNumberTo;
-    }
-
-    public void setAccountNumberTo(UUID accountNumberTo) {
-        this.accountNumberTo = accountNumberTo;
-    }
-
-    public Integer getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Integer amount) {
         this.amount = amount;
-    }
-
-    public LocalDateTime getTime() {
-        return time;
-    }
-
-    public void setTime(LocalDateTime time) {
         this.time = time;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 }

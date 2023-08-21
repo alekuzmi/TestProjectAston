@@ -51,7 +51,7 @@ public class ServiceImpl {
 
     @Transactional
     public Info info(String firstName, String lastName, String fatherName, String pin) throws BusinessException {
-        Client client = clientRepository.findByFirstNameAndLastName(firstName,lastName);
+        Client client = clientRepository.findByFirstNameAndLastName(firstName, lastName);
         System.out.println(client.getId());
         BankAccount[] bankAccounts = bankAccountRepository.findIdAndBalanceByClientId(client.getId());
         System.out.println(bankAccounts.length);
@@ -69,13 +69,16 @@ public class ServiceImpl {
         if (!md5sum(pin).equals(client.getPinHash())) {
             throw new BusinessException("PIN не подходит");
         }
+
         BankAccount bankAccount = bankAccountRepository.findById(accountNumberTo).get();
-        bankAccount.setBalance(bankAccount.getBalance() + count);
-        bankAccountRepository.save(bankAccount);
-        transactionRepository.save(new com.aston.demo.entity.Transaction(null, accountNumberTo,
-                count, LocalDateTime.now()));
-        return new ResponseTransaction(firstName, lastName, fatherName,
-                null, accountNumberTo, count);
+        synchronized (bankAccount.getId().toString().intern()) {
+            bankAccount.setBalance(bankAccount.getBalance() + count);
+            bankAccountRepository.save(bankAccount);
+            transactionRepository.save(new com.aston.demo.entity.Transaction(null, accountNumberTo,
+                    count, LocalDateTime.now()));
+            return new ResponseTransaction(firstName, lastName, fatherName,
+                    null, accountNumberTo, count);
+        }
     }
 
 
@@ -87,15 +90,17 @@ public class ServiceImpl {
             throw new BusinessException("PIN не подходит.");
         }
         BankAccount bankAccount = bankAccountRepository.findById(accountNumberFrom).get();
-        if (count > bankAccount.getBalance()) {
-            throw new BusinessException("Недостаточно средств.");
+        synchronized (bankAccount.getId().toString().intern()) {
+            if (count > bankAccount.getBalance()) {
+                throw new BusinessException("Недостаточно средств.");
+            }
+            bankAccount.setBalance(bankAccount.getBalance() - count);
+            bankAccountRepository.save(bankAccount);
+            transactionRepository.save(new com.aston.demo.entity.Transaction(accountNumberFrom, null,
+                    count, LocalDateTime.now()));
+            return new ResponseTransaction(firstName, lastName, fatherName,
+                    accountNumberFrom, null, count);
         }
-        bankAccount.setBalance(bankAccount.getBalance() - count);
-        bankAccountRepository.save(bankAccount);
-        transactionRepository.save(new com.aston.demo.entity.Transaction(accountNumberFrom, null,
-               count, LocalDateTime.now()));
-        return new ResponseTransaction(firstName, lastName, fatherName,
-                accountNumberFrom, null, count);
     }
 
     @Transactional
@@ -107,17 +112,27 @@ public class ServiceImpl {
         }
         BankAccount bankAccountFrom = bankAccountRepository.findById(accountNumberFrom).get();
         BankAccount bankAccountTo = bankAccountRepository.findById(accountNumberTo).get();
-        if (count > bankAccountFrom.getBalance()) {
-            throw new BusinessException("Недостаточно средств.");
+
+        UUID firstAccount = accountNumberFrom.compareTo(accountNumberTo) > 0 ? accountNumberFrom : accountNumberTo;
+        UUID secondAccount = accountNumberFrom.compareTo(accountNumberTo) > 0 ? accountNumberTo : accountNumberFrom;
+
+        synchronized (firstAccount.toString().intern()) {
+            synchronized (secondAccount.toString().intern()) {
+
+                if (count > bankAccountFrom.getBalance()) {
+                    throw new BusinessException("Недостаточно средств.");
+                }
+                bankAccountFrom.setBalance(bankAccountFrom.getBalance() - count);
+                bankAccountTo.setBalance(bankAccountTo.getBalance() + count);
+                bankAccountRepository.save(bankAccountFrom);
+                bankAccountRepository.save(bankAccountTo);
+                transactionRepository.save(new com.aston.demo.entity.Transaction(accountNumberFrom, accountNumberTo,
+                        count, LocalDateTime.now()));
+                return new ResponseTransaction(firstName, lastName, fatherName,
+                        accountNumberFrom, accountNumberTo, count);
+
+            }
         }
-        bankAccountFrom.setBalance(bankAccountFrom.getBalance() - count);
-        bankAccountTo.setBalance(bankAccountTo.getBalance() + count);
-        bankAccountRepository.save(bankAccountFrom);
-        bankAccountRepository.save(bankAccountTo);
-        transactionRepository.save(new com.aston.demo.entity.Transaction(accountNumberFrom, accountNumberTo,
-                count, LocalDateTime.now()));
-        return new ResponseTransaction(firstName, lastName, fatherName,
-                accountNumberFrom, accountNumberTo, count);
     }
 
     public static String md5sum(String input) {
@@ -132,5 +147,6 @@ public class ServiceImpl {
         BigInteger hash = new BigInteger(1, digest.digest());
         return (hash.toString(16));
     }
+
 }
 
