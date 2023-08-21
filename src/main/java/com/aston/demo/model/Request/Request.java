@@ -1,20 +1,11 @@
-package com.aston.demo.model;
+package com.aston.demo.model.Request;
 
-import com.aston.demo.entity.BankAccount;
-
-public class ResponseInfo {
+public class Request {
 
     private String firstName;
     private String lastName;
     private String fatherName;
-    private BankAccount[] bankAccounts;
-
-    public ResponseInfo(String firstName, String lastName, String fatherName, BankAccount[] bankAccounts) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.fatherName = fatherName;
-        this.bankAccounts = bankAccounts;
-    }
+    private String pin;
 
     public String getFirstName() {
         return firstName;
@@ -40,11 +31,13 @@ public class ResponseInfo {
         this.fatherName = fatherName;
     }
 
-    public BankAccount[] getBankAccounts() {
-        return bankAccounts;
+    public String getPin() {
+        return pin;
     }
 
-    public void setBankAccounts(BankAccount[] bankAccounts) {
-        this.bankAccounts = bankAccounts;
+    public void setPin(String pin) {
+        this.pin = pin;
     }
+
+
 }

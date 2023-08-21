@@ -1,7 +1,11 @@
 package com.aston.demo.controller;
 
 
-import com.aston.demo.model.*;
+import com.aston.demo.model.Request.Request;
+import com.aston.demo.model.Request.Transaction;
+import com.aston.demo.model.Response.ResponseCreate;
+import com.aston.demo.model.Response.Info;
+import com.aston.demo.model.Response.ResponseTransaction;
 import com.aston.demo.service.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +31,8 @@ public class Controller {
 
 
     @RequestMapping("/info")
-    public ResponseEntity<ResponseInfo> balance(@RequestBody Request request) {
-        ResponseInfo responseInfo = clientService.info(request);
+    public ResponseEntity<Info> balance(@RequestBody Request request) {
+        Info responseInfo = clientService.info(request);
         return ResponseEntity.ok(responseInfo);
     }
 
@@ -38,21 +42,21 @@ public class Controller {
     }
 
     @RequestMapping("/deposit")
-    public ResponseEntity<ResponseTransaction> deposit(@RequestBody RequestTransaction requestTransaction) {
-        ResponseTransaction responseTransaction = clientService.deposit(requestTransaction);
+    public ResponseEntity<ResponseTransaction> deposit(@RequestBody Transaction transaction) {
+        ResponseTransaction responseTransaction = clientService.deposit(transaction);
         return ResponseEntity.ok(responseTransaction);
     }
 
     @RequestMapping("/withdraw")
-    public ResponseEntity<ResponseTransaction> withdraw(@RequestBody RequestTransaction requestTransaction) {
-        ResponseTransaction responseTransaction = clientService.withdraw(requestTransaction);
+    public ResponseEntity<ResponseTransaction> withdraw(@RequestBody Transaction transaction) {
+        ResponseTransaction responseTransaction = clientService.withdraw(transaction);
         return ResponseEntity.ok(responseTransaction);
     }
 
 
     @RequestMapping("/transfer")
-    public ResponseEntity<ResponseTransaction> transfer(@RequestBody RequestTransaction requestTransaction) {
-        ResponseTransaction responseTransaction = clientService.transfer(requestTransaction);
+    public ResponseEntity<ResponseTransaction> transfer(@RequestBody Transaction transaction) {
+        ResponseTransaction responseTransaction = clientService.transfer(transaction);
         return ResponseEntity.ok(responseTransaction);
     }
 

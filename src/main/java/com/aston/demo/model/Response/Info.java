@@ -1,21 +1,19 @@
-package com.aston.demo.model;
+package com.aston.demo.model.Response;
 
-import java.util.UUID;
+import com.aston.demo.entity.BankAccount;
 
-public class ResponseCreate {
+public class Info {
 
     private String firstName;
     private String lastName;
     private String fatherName;
-    private UUID accountNumber;
-    private Integer balance;
+    private BankAccount[] bankAccounts;
 
-    public ResponseCreate(String firstName, String lastName, String fatherName, UUID accountNumber, Integer balance) {
+    public Info(String firstName, String lastName, String fatherName, BankAccount[] bankAccounts) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.fatherName = fatherName;
-        this.accountNumber = accountNumber;
-        this.balance = balance;
+        this.bankAccounts = bankAccounts;
     }
 
     public String getFirstName() {
@@ -42,19 +40,11 @@ public class ResponseCreate {
         this.fatherName = fatherName;
     }
 
-    public UUID getAccountNumber() {
-        return accountNumber;
+    public BankAccount[] getBankAccounts() {
+        return bankAccounts;
     }
 
-    public void setAccountNumber(UUID accountNumber) {
-        this.accountNumber = accountNumber;
-    }
-
-    public Integer getBalance() {
-        return balance;
-    }
-
-    public void setBalance(Integer balance) {
-        this.balance = balance;
+    public void setBankAccounts(BankAccount[] bankAccounts) {
+        this.bankAccounts = bankAccounts;
     }
 }
