@@ -1,0 +1,178 @@
+{
+	"info": {
+		"_postman_id": "00945058-43ce-429a-a5e8-f8b5daf0de3a",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29211254"
+	},
+	"item": [
+		{
+			"name": "create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"алена\",\r\n    \"lastName\": \"кузьмина\",\r\n    \"fatherName\": \"сергеевна\",\r\n    \"pin\": \"7777\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "balance",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"алена\",\r\n    \"lastName\": \"кузьмина\",\r\n    \"fatherName\": \"сергеевна\",\r\n    \"pin\": \"7777\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/balance",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"balance"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deposit",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"алена\",\r\n    \"lastName\": \"кузьмина\",\r\n    \"fatherName\": \"сергеевна\",\r\n    \"pin\": \"7777\",\r\n    \"accountNumberTo\": \"24e1b654-f086-48c5-a1fa-5eefa265c0df\",\r\n    \"count\": 100000\r\n  \r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/deposit",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"deposit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "withdraw",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"алена\",\r\n    \"lastName\": \"кузьмина\",\r\n    \"fatherName\": \"сергеевна\",\r\n    \"pin\": \"7777\",\r\n    \"accountNumberFrom\": \"24e1b654-f086-48c5-a1fa-5eefa265c0df\",\r\n    \"count\": 100000\r\n  \r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/withdraw",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"withdraw"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "transfer",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"алена\",\r\n    \"lastName\": \"кузьмина\",\r\n    \"fatherName\": \"сергеевна\",\r\n    \"pin\": \"7777\",\r\n    \"accountNumberFrom\": \"24e1b654-f086-48c5-a1fa-5eefa265c0df\",\r\n    \"accountNumberTo\": \"2ef46d21-240a-4ccb-8e37-82bf4337b5b8\",\r\n    \"count\": 100000\r\n  \r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/transfer",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"transfer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "history",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"алена\",\r\n    \"lastName\": \"кузьмина\",\r\n    \"fatherName\": \"сергеевна\",\r\n    \"pin\": \"7777\",\r\n    \"accountNumber\": \"24e1b654-f086-48c5-a1fa-5eefa265c0df\"\r\n  \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/history",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"history"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,13 @@
+version: '3.3'
+
+services:
+
+  db:
+    build: ./db
+    container_name: postgress
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=demo
+      - POSTGRES_PASSWORD=demo
+      - POSTGRES_DB=demo
