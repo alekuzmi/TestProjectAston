@@ -30,3 +30,12 @@ CREATE TABLE public.transactions (
 
 ALTER TABLE public.transactions ADD CONSTRAINT transactions_fk FOREIGN KEY (account_number_from) REFERENCES public.bank_accounts(id);
 ALTER TABLE public.transactions ADD CONSTRAINT transactions_fk_1 FOREIGN KEY (account_number_to) REFERENCES public.bank_accounts(id);
+
+
+INSERT INTO clients
+(id, pin_hash, first_name, last_name, father_name)
+VALUES(1, '-', 'Банкомат', 'Банкомат', NULL);
+
+INSERT INTO public.bank_accounts
+(id, client_id, balance)
+VALUES('00000000-0000-0000-0000-000000000000'::uuid, 1, 0);
