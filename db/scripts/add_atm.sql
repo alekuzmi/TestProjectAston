@@ -1,0 +1,1 @@
+COPY public.clients FROM '/data/datasource.csv' DELIMITER ',' CSV HEADER;
