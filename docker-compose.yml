@@ -11,5 +11,3 @@ services:
       - POSTGRES_USER=demo
       - POSTGRES_PASSWORD=demo
       - POSTGRES_DB=demo
-    volumes:
-      - ./data:/data
